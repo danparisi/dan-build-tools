@@ -45,6 +45,15 @@ spec:
             - name: http
               containerPort: 8080
               protocol: TCP
+          startupProbe:
+            httpGet:
+              port: 8080
+              path: /health
+            periodSeconds: 5
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 15
+            initialDelaySeconds: 20
           livenessProbe:
             httpGet:
               port: 8080
