@@ -112,7 +112,7 @@ spec:
             parallel {
                 stage("Build") {
                     steps {
-                        sh "${MVN} clean test"
+                        sh "${MVN} clean test -T 1C"
                     }
                 }
                 stage("Checkstyle") {
@@ -125,7 +125,7 @@ spec:
 
         stage("Deploy maven artifact") {
             steps {
-                sh "${MVN} deploy -DskipTests"
+                sh "${MVN} deploy -Dmaven.test.skip -DskipTests"
             }
         }
 
