@@ -52,8 +52,8 @@ spec:
             periodSeconds: 5
             timeoutSeconds: 5
             successThreshold: 1
-            failureThreshold: 15
-            initialDelaySeconds: 20
+            failureThreshold: 18
+            initialDelaySeconds: 30
           livenessProbe:
             httpGet:
               port: 8080
@@ -74,6 +74,19 @@ spec:
             failureThreshold: 3
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          env:
+            {{- with .Values.additionalEnvs }}
+              {{- toYaml . | nindent 12 }}
+            {{- end }}
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
