@@ -163,9 +163,12 @@ spec:
 
                         sh "${MVN} helm:init helm:dependency-build helm:lint helm:package"
 
-                        sh "${MVN} -X helm:package helm:registry-login"
+                        sh "${MVN} helm:package helm:registry-login"
 
-                        sh "./target/helm/helm push target/helm/repo/${SERVICE_NAME}-${SERVICE_VERSION}.tgz oci://nexus-dan-helm-snapshot-http:30601 --plain-http"
+                        sh '''
+                            # Need to turn off insecure flag because it creates a conflict if used along with --plain-http
+                            ${MVN} helm:push -Dhelm.insecure-skip-tls-verify.enabled=false
+                        '''
                     }
                 }
             }
@@ -175,7 +178,7 @@ spec:
             when { environment name: 'HELM_CHART_ENABLED', value: 'true' }
 
             steps {
-                sh '${MVN} -X helm:upgrade'
+                sh '${MVN} helm:upgrade'
             }
         }
     }
