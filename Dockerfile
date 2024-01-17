@@ -30,4 +30,4 @@ COPY --from=builder application/unpacked-with-layers/dependencies/ ./
 COPY --from=builder application/unpacked-with-layers/spring-boot-loader/ ./
 COPY --from=builder application/unpacked-with-layers/snapshot-dependencies/ ./
 
-ENTRYPOINT java ${JAVA_OPTS} ${JAVA_EXTRA_OPTS} org.springframework.boot.loader.JarLauncher
+ENTRYPOINT java ${JAVA_OPTS} ${JAVA_EXTRA_OPTS} org.springframework.boot.loader.launch.JarLauncher
