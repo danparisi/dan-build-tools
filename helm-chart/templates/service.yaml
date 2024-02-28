@@ -5,6 +5,9 @@ metadata:
   name: {{ include "dan-shop.fullname" . }}
   labels:
     {{- include "dan-shop.labels" . | nindent 4 }}
+    {{- with .Values.service.labels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
   {{- with .Values.service.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
@@ -12,10 +15,10 @@ metadata:
 spec:
   type: {{ .Values.service.type }}
   ports:
-    - port: {{ .Values.service.port }}
-      targetPort: http
+    - name: http
       protocol: TCP
-      name: http
+      targetPort: http
+      port: {{ .Values.service.port }}
   selector:
     {{- include "dan-shop.selectorLabels" . | nindent 4 }}
 # @formatter:on
