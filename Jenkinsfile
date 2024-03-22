@@ -135,6 +135,8 @@ spec:
                     when { environment name: 'DOCKER_IMAGE_ENABLED', value: 'true' }
 
                     steps {
+                        sh "Skip..."
+
                         //sh '''
                         //    # Moving Dockerfile
                         //    mv dan-build-tools/Dockerfile .
