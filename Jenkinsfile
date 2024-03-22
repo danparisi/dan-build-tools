@@ -14,51 +14,36 @@ spec:
     - name: jenkins-docker-cache-pvc
       persistentVolumeClaim:
         claimName: jenkins-docker-cache-pvc
+    - hostPath:
+        type: Socket
+        path: /run/docker.sock
+      name: docker-sock
+    - hostPath:
+        type: Directory
+        path: /var/lib/docker
+      name: docker-lib
   containers:
   - name: maven
     image: maven:3.9.6-eclipse-temurin-21
     tty: true
     command: [ "sleep" ]
     args: [ "infinity" ]
-    env:
-    - name: DOCKER_HOST
-      value: "tcp://localhost:2375"
     volumeMounts:
     - mountPath: "/root/.m2/repository"
       name: jenkins-m2-pvc
+    - mountPath: /var/run/docker.sock
+      name: docker-sock
+      readOnly: false
+    - mountPath: /var/lib/docker
+      name: docker-lib
+      readOnly: false
     resources:
       requests:
         cpu: 100m
         memory: 256Mi
       limits:
-        cpu: 500m
-        memory: 1Gi
-  - name: docker-daemon
-    image: docker:dind
-    tty: true
-    securityContext:
-        privileged: true
-    command: [  "dockerd", "--host", "tcp://127.0.0.1:2375",
-                "--registry-mirror", "http://nexus-docker-proxy-http:30400",
-                "--insecure-registry", "nexus-docker-proxy-http:30400",
-                "--insecure-registry", "nexus-dan-helm-release-http:30600",
-                "--insecure-registry", "nexus-dan-helm-snapshot-http:30601",
-                "--insecure-registry", "nexus-dan-docker-release-http:30500",
-                "--insecure-registry", "nexus-dan-docker-snapshot-http:30501"
-             ]
-    env:
-    - name: DOCKER_HOST
-      value: "tcp://localhost:2375"
-    volumeMounts:
-    - mountPath: "/tmp"
-      name: jenkins-docker-cache-pvc
-    resources:
-      requests:
-        cpu: 100m
-        memory: 256Mi
-      limits:
-        cpu: 500m
-        memory: 1Gi
+        cpu: 1
+        memory: 4Gi
 '''
         }
     }
@@ -85,19 +70,16 @@ spec:
                 '''
 
                 script {
-                    env.MVN="mvn --settings settings.xml"
+                    env.MVN="mvn --settings settings.xml -T 1"
 
                     env.SERVICE_NAME=sh(script: '${MVN} help:evaluate -Dexpression=project.name -q -DforceStdout', returnStdout: true).trim()
                     env.SERVICE_VERSION=sh(script: '${MVN} help:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true).trim()
                     env.HELM_CHART_ENABLED=sh(script: '${MVN} help:evaluate -Dexpression=helm.chart.enabled -q -DforceStdout', returnStdout: true).trim()
                     env.DOCKER_IMAGE_ENABLED=sh(script: '${MVN} help:evaluate -Dexpression=docker.image.enabled -q -DforceStdout', returnStdout: true).trim()
+                    env.BUILD_NATIVE_IMAGE_ENABLED=sh(script: '${MVN} help:evaluate -Dexpression=native.image.enabled -q -DforceStdout', returnStdout: true).trim()
+                    env.DOCKER_REPOSITORY_EXTERNAL_URL=sh(script: '${MVN} help:evaluate -Dexpression=docker.repository.external.url -q -DforceStdout', returnStdout: true).trim()
 
-                    if (env.DOCKER_IMAGE_ENABLED == "true") {
-                        // TODO: Release docker repo with RELEASE one if needed, currently fixed to SNAPSHOT
-                        env.DOCKER_REPOSITORY_EXTERNAL=sh(script: '${MVN} help:evaluate -Dexpression=docker.repository.external -q -DforceStdout', returnStdout: true).trim()
-
-                        env.DOCKER_IMAGE_EXTERNAL="${env.DOCKER_REPOSITORY_EXTERNAL}/repository/docker/${env.SERVICE_NAME}"
-                    }
+                    env.DOCKER_IMAGE_EXTERNAL="${env.DOCKER_REPOSITORY_EXTERNAL_URL}/repository/docker/${env.SERVICE_NAME}"
                 }
             }
         }
@@ -106,7 +88,7 @@ spec:
             parallel {
                 stage("Build") {
                     steps {
-                        sh "${MVN} clean test -T 1C"
+                        sh "${MVN} clean test"
                     }
                 }
                 stage("Checkstyle") {
@@ -120,6 +102,14 @@ spec:
         stage("Deploy maven artifact") {
             steps {
                 sh "${MVN} deploy -Dmaven.test.skip -DskipTests"
+            }
+        }
+
+        stage("Build / Push Native image") {
+            when { environment name: 'BUILD_NATIVE_IMAGE_ENABLED', value: 'true' }
+
+            steps {
+                sh "${MVN} -e -Pnative -DskipTests spring-boot:build-image"
             }
         }
 
