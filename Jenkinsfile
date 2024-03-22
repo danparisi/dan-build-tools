@@ -123,6 +123,12 @@ spec:
             }
         }
 
+        stage("Experimental - Build Native") {
+            steps {
+                sh "${MVN} -Pnative -DskipTests spring-boot:build-image spring-boot:build-image"
+            }
+        }
+
         stage("Packaging") {
             parallel {
                 stage("Docker image") {
