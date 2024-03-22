@@ -85,7 +85,7 @@ spec:
                 '''
 
                 script {
-                    env.MVN="mvn --settings settings.xml"
+                    env.MVN="mvn --settings settings.xml -T 1C"
 
                     env.SERVICE_NAME=sh(script: '${MVN} help:evaluate -Dexpression=project.name -q -DforceStdout', returnStdout: true).trim()
                     env.SERVICE_VERSION=sh(script: '${MVN} help:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true).trim()
@@ -106,7 +106,7 @@ spec:
             parallel {
                 stage("Build") {
                     steps {
-                        sh "${MVN} clean test -T 1C"
+                        sh "${MVN} clean test"
                     }
                 }
                 stage("Checkstyle") {
@@ -125,7 +125,7 @@ spec:
 
         stage("Experimental - Build Native") {
             steps {
-                sh "${MVN} -Pnative -DskipTests spring-boot:build-image spring-boot:build-image"
+                sh "${MVN} -X -e -Pnative -DskipTests spring-boot:build-image spring-boot:build-image"
             }
         }
 
@@ -135,12 +135,12 @@ spec:
                     when { environment name: 'DOCKER_IMAGE_ENABLED', value: 'true' }
 
                     steps {
-                        sh '''
-                            # Moving Dockerfile
-                            mv dan-build-tools/Dockerfile .
-                            ${MVN} dockerfile:build
-                            ${MVN} dockerfile:push -Ddockerfile.username=jenkins -Ddockerfile.password=jenkins
-                        '''
+                        //sh '''
+                        //    # Moving Dockerfile
+                        //    mv dan-build-tools/Dockerfile .
+                        //    ${MVN} dockerfile:build
+                        //    ${MVN} dockerfile:push -Ddockerfile.username=jenkins -Ddockerfile.password=jenkins
+                        //'''
                    }
                 }
 
