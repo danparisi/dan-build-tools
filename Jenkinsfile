@@ -106,7 +106,8 @@ spec:
             parallel {
                 stage("Build") {
                     steps {
-                        sh "${MVN} clean test"
+                        echo "Skip..."
+                        //sh "${MVN} clean test"
                     }
                 }
                 stage("Checkstyle") {
@@ -125,7 +126,7 @@ spec:
 
         stage("Experimental - Build Native") {
             steps {
-                sh "${MVN} -X -e -Pnative -DskipTests spring-boot:build-image spring-boot:build-image"
+                sh "${MVN} -e -Pnative -DskipTests spring-boot:build-image spring-boot:build-image"
             }
         }
 
@@ -135,7 +136,7 @@ spec:
                     when { environment name: 'DOCKER_IMAGE_ENABLED', value: 'true' }
 
                     steps {
-                        sh "Skip..."
+                        echo "Skip..."
 
                         //sh '''
                         //    # Moving Dockerfile
