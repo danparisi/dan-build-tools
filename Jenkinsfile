@@ -127,7 +127,7 @@ spec:
 
         stage("Experimental - Build Native") {
             steps {
-                sh "${MVN} -e -X -Pnative -DskipTests spring-boot:build-image spring-boot:build-image"
+                sh "${MVN} -e -X -Pnative -DskipTests spring-boot:build-image"
             }
         }
 
