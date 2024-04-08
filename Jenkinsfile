@@ -23,6 +23,14 @@ spec:
         path: /var/lib/docker
       name: docker-lib
   containers:
+  - name: jnlp
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 1
+        memory: 4Gi
   - name: maven
     image: maven:3.9.6-eclipse-temurin-21
     tty: true
