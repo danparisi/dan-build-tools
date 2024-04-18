@@ -109,7 +109,7 @@ spec:
 
         stage("Deploy maven artifact") {
             steps {
-                sh "${MVN} deploy -Dmaven.test.skip -DskipTests"
+                sh "${MVN} -Pnative deploy -Dmaven.test.skip -DskipTests"
             }
         }
 
