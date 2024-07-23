@@ -1,6 +1,6 @@
 # @formatter:off
 {{- if .Values.autoscaling.enabled }}
-apiVersion: autoscaling/v2beta1
+apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: {{ include "dan-shop.fullname" . }}
@@ -26,5 +26,42 @@ spec:
         name: memory
         targetAverageUtilization: {{ .Values.autoscaling.targetMemoryUtilizationPercentage }}
     {{- end }}
+    {{- if .Values.autoscaling.targetRequestOrdersPerSecond }}
+    - type: Pods
+      pods:
+        metric:
+          name: request_orders_per_second
+        target:
+          type: AverageValue
+          averageValue: {{ .Values.autoscaling.targetRequestOrdersPerSecond }}
+    {{- end }}
+    {{- if .Values.autoscaling.targetRequestNewOrdersPerSecond }}
+    - type: Pods
+      pods:
+        metric:
+          name: request_new_orders_per_second
+        target:
+          type: AverageValue
+          averageValue: {{ .Values.autoscaling.targetRequestNewOrdersPerSecond }}
+    {{- end }}
+    {{- if .Values.autoscaling.targetConsumerClientOrdersPerSecond }}
+    - type: Pods
+      pods:
+        metric:
+          name: consumer_dan_client_orders_per_second
+        target:
+          type: AverageValue
+          averageValue: {{ .Values.autoscaling.targetConsumerClientOrdersPerSecond }}
+    {{- end }}
+    {{- if .Values.autoscaling.targetConsumerStreetOrdersPerSecond }}
+    - type: Pods
+      pods:
+        metric:
+          name: consumer_dan_street_orders_per_second
+        target:
+          type: AverageValue
+          averageValue: {{ .Values.autoscaling.targetConsumerStreetOrdersPerSecond }}
+    {{- end }}
+
 {{- end }}
 # @formatter:on
