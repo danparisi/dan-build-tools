@@ -11,9 +11,6 @@ spec:
     - name: jenkins-m2-pvc
       persistentVolumeClaim:
         claimName: jenkins-m2-pvc
-    - name: jenkins-docker-cache-pvc
-      persistentVolumeClaim:
-        claimName: jenkins-docker-cache-pvc
     - hostPath:
         type: Socket
         path: /run/docker.sock
