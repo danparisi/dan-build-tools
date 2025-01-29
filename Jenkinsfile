@@ -1,4 +1,8 @@
 pipeline {
+    parameters {
+        string description: 'Repository URL', name: 'DAN_JOB_REPOSITORY'
+        string description: 'Repository branch', name: 'DAN_JOB_REPOSITORY_BRANCH', defaultValue: 'main'
+    }
     agent {
         kubernetes {
             cloud "kubernetes"
@@ -55,7 +59,7 @@ spec:
     stages {
         stage('Checkout project') {
             steps {
-                git branch: 'main', url: '${DAN_JOB_REPOSITORY}'
+                git branch: '${DAN_JOB_REPOSITORY_BRANCH}', url: '${DAN_JOB_REPOSITORY}'
             }
         }
 
