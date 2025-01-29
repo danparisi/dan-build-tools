@@ -1,4 +1,4 @@
-FROM openjdk:21 as builder
+FROM openjdk:23 as builder
 EXPOSE 8080
 
 WORKDIR application
@@ -7,7 +7,7 @@ COPY target/*.jar target/
 RUN java -Djarmode=layertools -jar target/*.jar extract --destination unpacked-with-layers
 
 
-FROM amazoncorretto:21
+FROM amazoncorretto:23
 
 EXPOSE 8080 5005
 

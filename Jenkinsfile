@@ -29,7 +29,7 @@ spec:
         cpu: 1
         memory: 4Gi
   - name: maven
-    image: maven:3.9.6-eclipse-temurin-21
+    image: maven:3.9.9-sapmachine-23
     tty: true
     command: [ "sleep" ]
     args: [ "infinity" ]
