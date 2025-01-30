@@ -80,6 +80,7 @@ spec:
 
                 script {
                     env.MVN="mvn --settings settings.xml -T 1"
+                    env.MVN_BUILD_ADDITIONAL_ARGS=sh(script: '${MVN} help:evaluate -Dexpression=mvn.build.additional-args -q -DforceStdout', returnStdout: true).trim()
 
                     env.SERVICE_NAME=sh(script: '${MVN} help:evaluate -Dexpression=project.name -q -DforceStdout', returnStdout: true).trim()
                     env.SERVICE_VERSION=sh(script: '${MVN} help:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true).trim()
@@ -97,7 +98,7 @@ spec:
             parallel {
                 stage("Build") {
                     steps {
-                        sh "${MVN} clean test"
+                        sh "${MVN} ${MVN_BUILD_ADDITIONAL_ARGS} clean test"
                     }
                 }
                 stage("Checkstyle") {
