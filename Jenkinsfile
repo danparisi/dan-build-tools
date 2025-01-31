@@ -1,8 +1,4 @@
 pipeline {
-    parameters {
-        string description: 'Repository URL', name: 'DAN_JOB_REPOSITORY'
-        string description: 'Repository branch', name: 'DAN_JOB_REPOSITORY_BRANCH', defaultValue: 'main'
-    }
     agent {
         kubernetes {
             cloud "kubernetes"
@@ -56,6 +52,7 @@ spec:
 '''
         }
     }
+
     stages {
         stage('Checkout project') {
             steps {
@@ -109,7 +106,17 @@ spec:
             }
         }
 
-        stage("Deploy maven artifact") {
+        stage("Deploy maven artifact [no native support]") {
+            when { environment name: 'BUILD_NATIVE_IMAGE_ENABLED', value: 'false' }
+
+            steps {
+                sh "${MVN} deploy -Dmaven.test.skip -DskipTests"
+            }
+        }
+
+        stage("Deploy maven artifact [native support]") {
+            when { environment name: 'BUILD_NATIVE_IMAGE_ENABLED', value: 'true' }
+
             steps {
                 sh "${MVN} -Pnative deploy -Dmaven.test.skip -DskipTests"
             }
