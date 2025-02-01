@@ -46,24 +46,11 @@ spec:
               containerPort: 8080
               protocol: TCP
           startupProbe:
-            httpGet:
-              port: http
-              path: /health
-            periodSeconds: 5
-            timeoutSeconds: 5
-            successThreshold: 1
-            failureThreshold: 18
-            initialDelaySeconds: 30
+            {{- toYaml .Values.startupProbe | nindent 12 }}
           livenessProbe:
-            httpGet:
-              port: http
-              path: /health/ping
-            initialDelaySeconds: 20
-            periodSeconds: 10
-            timeoutSeconds: 5
-            successThreshold: 1
-            failureThreshold: 3
+            {{- toYaml .Values.livenessProbe | nindent 12 }}
           readinessProbe:
+            {{- toYaml .Values.readinessProbe | nindent 12 }}
             httpGet:
               port: http
               path: /health
