@@ -21,7 +21,6 @@ ENV JAVA_OPTS "-verbose:gc \
              -Dcom.sun.management.jmxremote.port=9010 \
              -Dcom.sun.management.jmxremote.rmi.port=9011 \
              -Djava.rmi.server.hostname=localhost \
-             -Xmx512m \
              -XX:CompressedClassSpaceSize=50m \
              -XX:-TieredCompilation"
 
